@@ -150,7 +150,7 @@ Mat addSaltAndPepper(Mat image) {
     return result;
 }
 
-Mat addGaussian(Mat image, float mean=10, float std_dev=40) {
+Mat addGaussian(Mat image, float mean=30, float std_dev=50) {
     Mat result = image.clone();
     RNG rng(12345);
     Mat gaussian_noise = Mat::zeros(image.rows, image.cols, image.type());
