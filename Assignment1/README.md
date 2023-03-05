@@ -102,30 +102,29 @@
 ### 效果展示
 
 #### 原图
-
-+ <img src="\assets\original.png" alt="image-20230305201053547" style="zoom:40%;" />
++ <img src="assets/original.png" alt="image-20230305201053547" style="zoom:40%;" />
 
 #### 椒盐噪声及其中值滤波结果
 
 + 添加椒盐噪声结果：
 
-​				<img src="\assets\salt_pepper_noise.png" alt="image-20230305201053547" style="zoom:40%;" />
+​				<img src="assets/salt_pepper_noise.png" alt="image-20230305201053547" style="zoom:40%;" />
 
 + OpenCV内置函数进行中值滤波：
 
-  ​		<img src="\assets\salt_opencv_median_result.png" alt="image-20230305201053547" style="zoom:40%;" />
+  ​		<img src="assets/salt_opencv_median_result.png" alt="image-20230305201053547" style="zoom:40%;" />
 
 + 自行编写的滤波函数进行中值滤波：
 
-​				<img src="\assets\salt_our_median_result.png" alt="image-20230305201053547" style="zoom:40%;" />
+​				<img src="assets/salt_our_median_result.png" alt="image-20230305201053547" style="zoom:40%;" />
 
 #### 高斯噪声及其高斯滤波结果
 
 + 添加高斯噪声结果：
-​				<img src="\assets\gaussian_noise.png" alt="image-20230305201053547" style="zoom:40%;" />
+​				<img src="assets/gaussian_noise.png" alt="image-20230305201053547" style="zoom:40%;" />
 + OpenCV内置函数进行高斯滤波：
-​				<img src="\assets\gaussian_opencv_result.png" alt="image-20230305201053547" style="zoom:40%;" />
+​				<img src="assets/gaussian_opencv_result.png" alt="image-20230305201053547" style="zoom:40%;" />
 + 自行编写的滤波函数进行高斯滤波：
-​				<img src="\assets\gaussian_our_result.png" alt="image-20230305201053547" style="zoom:40%;" />
+​				<img src="assets/gaussian_our_result.png" alt="image-20230305201053547" style="zoom:40%;" />
 
 仔细看还是可以看出高斯噪声滤波结果的。
