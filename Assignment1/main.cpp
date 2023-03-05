@@ -45,6 +45,7 @@ public:
         Mat result = this->image.clone();
         for (int i = 0; i < this->image.rows; i++) {
             for(int j = 0; j < this->image.cols; j++) {
+                cout << "Median Filter processing " << i << " " << j << endl;
                 vector<Vec3b> values;
                 uchar r, g, b;
                 if(i - kernel_center >= 0 && j - kernel_center >= 0\
@@ -80,7 +81,7 @@ public:
         cout << gaussian_kernel[0][0] << endl;
         for(int i = 0; i < this->image.rows; i++) {
             for(int j = 0; j < this->image.cols; j++) {
-                cout << i << " " << j << endl;
+                cout << "Gaussian Filter processing " << i << " " << j << endl;
                 if(i - kernel_center >= 0 && j - kernel_center >= 0\
                     && i + kernel_center < this->image.rows && j + kernel_center < this->image.cols) {
                     // 对三个通道都做滤波
@@ -161,7 +162,7 @@ Mat addGaussian(Mat image, float mean=10, float std_dev=40) {
 }
 
 void displayHelp(char** argv) {
-    cout << "Usage: " << argv[0] << "<noise mode>" << "<filter mode>(optional)" << endl;
+    cout << "Usage: " << argv[0] << " <noise mode> " << " <filter mode>(optional)" << endl;
     cout << "<noise mode>" << endl;
     cout << "\tdo_gaussian: use gaussian noise and gaussian filter" << endl;
     cout << "\tdo_salt: use salt and pepper noise and median filter" << endl;
@@ -184,45 +185,57 @@ int main(int argc, char** argv) {
     }
     imshow("original campus picture", image);
     string noise_mode = argv[1];
-    string filter_mode = argv[2];
+
     if(noise_mode == "do_salt") {
         Mat salt_pepper_noise = addSaltAndPepper(image);
         imshow("Salt and Pepper noise", salt_pepper_noise);
 
-        if(filter_mode == "opencv") {
-            OpenCVFilter opencv_filter = OpenCVFilter(salt_pepper_noise);
-            imshow("opencv filter result", opencv_filter.medianFilterMethod());
-        } else if(filter_mode == "our") {
-            Filter our_filter = Filter(salt_pepper_noise);
-            Mat median_filter_result = our_filter.medianFilterMethod();
-            imshow("our filter result", median_filter_result);
-        } else if(filter_mode == "both") {
-            OpenCVFilter opencv_filter = OpenCVFilter(salt_pepper_noise);
-            imshow("opencv filter result", opencv_filter.medianFilterMethod());
+        if (argc == 3) {
+            string filter_mode = argv[2];
+            if(filter_mode == "opencv") {
+                OpenCVFilter opencv_filter = OpenCVFilter(salt_pepper_noise);
+                imshow("opencv filter result", opencv_filter.medianFilterMethod());
+            } else if(filter_mode == "our") {
+                Filter our_filter = Filter(salt_pepper_noise);
+                Mat median_filter_result = our_filter.medianFilterMethod();
+                imshow("our filter result", median_filter_result);
+            } else if(filter_mode == "both") {
+                OpenCVFilter opencv_filter = OpenCVFilter(salt_pepper_noise);
+                imshow("opencv filter result", opencv_filter.medianFilterMethod());
 
-            Filter our_filter = Filter(salt_pepper_noise);
-            Mat median_filter_result = our_filter.medianFilterMethod();
-            imshow("our filter result", median_filter_result);
+                Filter our_filter = Filter(salt_pepper_noise);
+                Mat median_filter_result = our_filter.medianFilterMethod();
+                imshow("our filter result", median_filter_result);
+            } else {
+                displayHelp(argv);
+                return -1;
+            }
         }
 
     } else if (noise_mode == "do_gaussian") {
         Mat gaussian_noise = addGaussian(image);
         imshow("Gaussian noise", gaussian_noise);
 
-        if(filter_mode == "opencv") {
-            OpenCVFilter opencv_filter = OpenCVFilter(gaussian_noise);
-            imshow("opencv filter result", opencv_filter.gaussianFilterMethod());
-        } else if(filter_mode == "our") {
-            Filter our_filter = Filter(gaussian_noise);
-            Mat gaussian_filter_result = our_filter.gaussianFilterMethod();
-            imshow("our filter result", gaussian_filter_result);
-        } else if(filter_mode == "both") {
-            OpenCVFilter opencv_filter = OpenCVFilter(gaussian_noise);
-            imshow("opencv filter result", opencv_filter.gaussianFilterMethod());
+        if(argc == 3) {
+            string filter_mode = argv[2];
+            if(filter_mode == "opencv") {
+                OpenCVFilter opencv_filter = OpenCVFilter(gaussian_noise);
+                imshow("opencv filter result", opencv_filter.gaussianFilterMethod());
+            } else if(filter_mode == "our") {
+                Filter our_filter = Filter(gaussian_noise);
+                Mat gaussian_filter_result = our_filter.gaussianFilterMethod();
+                imshow("our filter result", gaussian_filter_result);
+            } else if(filter_mode == "both") {
+                OpenCVFilter opencv_filter = OpenCVFilter(gaussian_noise);
+                imshow("opencv filter result", opencv_filter.gaussianFilterMethod());
 
-            Filter our_filter = Filter(gaussian_noise);
-            Mat gaussian_filter_result = our_filter.gaussianFilterMethod();
-            imshow("our filter result", gaussian_filter_result);
+                Filter our_filter = Filter(gaussian_noise);
+                Mat gaussian_filter_result = our_filter.gaussianFilterMethod();
+                imshow("our filter result", gaussian_filter_result);
+            } else {
+                displayHelp(argv);
+                return -1;
+            }
         }
 
     } else {
