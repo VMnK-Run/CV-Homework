@@ -13,7 +13,6 @@ bool leftButtonDownFlag = false;
 Point originalPoint; 
 Point processPoint;
 
-Mat targetImageHSV;
 int histSize = 200;
 float histR[] = {0, 255};
 const float *histRange = histR;
@@ -21,7 +20,6 @@ int channels[] = {0, 1};
 Mat dstHist;
 Rect rect;
 vector<Point> pt; //保存目标轨迹
-RotatedRect track_box;
 void onMouse(int event, int x, int y, int flags, void* ustc); //鼠标回调函数  
 
 int main(int argc, char** argv) {
@@ -57,15 +55,15 @@ int main(int argc, char** argv) {
             } else if(mode == "cam") {
                 cv::CamShift(calcBackImage, rect, criteria);
             } 
-			Mat imageROI = imageHSV(rect);   //更新模板			
-			targetImageHSV = imageHSV(rect);
-			calcHist(&imageROI, 2, channels, Mat(), dstHist, 1, &histSize, &histRange);
-			normalize(dstHist, dstHist, 0.0, 1.0, NORM_MINMAX);   //归一化
 			rectangle(image, rect, Scalar(0, 0, 255), 3);  	//目标绘制	
 			pt.push_back(Point(rect.x + rect.width / 2, rect.y + rect.height / 2));
 			for (int i = 0; i < pt.size() - 1; i++) {
 				line(image, pt[i], pt[i + 1], Scalar(0, 255, 0), 2.5);
 			}
+
+            Mat imageROI = imageHSV(rect);   //更新模板			
+			calcHist(&imageROI, 2, channels, Mat(), dstHist, 1, &histSize, &histRange);
+			normalize(dstHist, dstHist, 0.0, 1.0, NORM_MINMAX);   //归一化
 		}
 		imshow("Tracking", image);
 		if(waitKey(10) == 27) {
@@ -92,7 +90,8 @@ void onMouse(int event, int x, int y, int flags, void *ustc) {
 	if (event == EVENT_LBUTTONUP) {
 		leftButtonDownFlag = false;
 		rect = Rect(originalPoint, processPoint);
-		Mat rectImage = image(rect); //子图像显示  
+		Mat rectImage = image(rect); //子图像显示
+        Mat targetImageHSV;
 		imshow("Sub Image", rectImage);
 		cvtColor(rectImage, targetImageHSV, COLOR_RGB2HSV);
 		calcHist(&targetImageHSV, 2, channels, Mat(), dstHist, 1, &histSize, &histRange, true, false);
