@@ -13,7 +13,7 @@ private:
 
 public:
     OpenCVDetector(cv::Mat src) : src(src) {}
-    void harriesDetection();
+    void harriesDetection(int threshold=130);
     void SIFTDetection();
 };
 
@@ -23,7 +23,7 @@ private:
 
 public:
     MyDetector(cv::Mat src) : src(src) {}
-    void harriesDetection();
+    void harriesDetection(int threshold=110);
     void SIFTDetection();
 };
 

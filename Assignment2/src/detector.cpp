@@ -1,6 +1,6 @@
 #include "detector.h"
 
-void OpenCVDetector::harriesDetection() {
+void OpenCVDetector::harriesDetection(int threshold) {
     Mat result = this->src.clone();
     Mat gray, norm_dst;
     Mat dst = Mat::zeros(this->src.size(), CV_32FC1);
@@ -12,20 +12,22 @@ void OpenCVDetector::harriesDetection() {
 
     cv::cornerHarris(gray, dst, block_size, ksize, k, BORDER_DEFAULT);
     normalize(dst, norm_dst, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
+    cv::threshold(norm_dst, norm_dst, threshold, 255, THRESH_BINARY);
 
     for(int i = 0; i < dst.rows; i++) {
         for(int j = 0; j < dst.cols; j++) {
-            if(norm_dst.at<float>(i, j) > 150) {
+            if(norm_dst.at<float>(i, j) > threshold) {
                 Point pt(j, i);
-                circle(result, pt, 2, Scalar(0, 255, 0), 2, 8, 0);
+                line(result, pt - Point(4, 0), pt + Point(4, 0), Scalar(0, 255, 0), 1);
+                line(result, pt - Point(0, 4), pt + Point(0, 4), Scalar(0, 255, 0), 1);
             }
         }
     }
 
-    imshow("result", result);
+    imshow("Harries Result", result);
 }
 
-void MyDetector::harriesDetection() {
+void MyDetector::harriesDetection(int threshold) {
     Mat gray;
     cvtColor(this->src, gray, COLOR_BGR2GRAY);
 
@@ -43,7 +45,7 @@ void MyDetector::harriesDetection() {
     }
 
     GaussianBlur(M, M, Size(5, 5), 2, 2);
-
+    
     Mat R = Mat::zeros(gray.size(), CV_32F);
     for (int i = 0; i < gray.rows; i++) {
         for (int j = 0; j < gray.cols; j++) {
@@ -58,29 +60,43 @@ void MyDetector::harriesDetection() {
         }
     }
 
-    for(int i = 2; i < R.rows; i++) {
-        for (int j = 2; j < R.cols; j++) {
-            for (int k = i - 2; k <= i + 2; k++)
-                for (int l = j - 2; l <= j + 2; l++)
-                    if (R.at<float>(k, l) <= R.at<float>(i, j) && k != i && l != j && R.at<float>(k, l) > 0) {
-                        R.at<float>(i, j) = 0;    
+    // 非极大值抑制
+    int halfWindowSize = 2;
+    for(int i = halfWindowSize; i < R.rows - halfWindowSize; i++) {
+        for (int j = halfWindowSize; j < R.cols - halfWindowSize; j++) {
+            bool isMax = true;
+            for (int k = -halfWindowSize; k <= halfWindowSize; k++){
+                for (int l = -halfWindowSize; l <= halfWindowSize; l++){
+                    if ((k != 0 || l != 0) && R.at<float>(i + k, j + l) >= R.at<float>(i, j)) {
+                        isMax = false;
+                        break;
                     }
+                }
+                if(!isMax) {
+                    break;
+                }
+            }
+            if(!isMax && R.at<float>(i, j) > threshold) {
+                R.at<float>(i, j) = 0;
+            }
         }
     }
-
+    
     normalize(R, R, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
+    cv::threshold(R, R, threshold, 255, THRESH_BINARY);
 
     Mat result = this->src.clone();
     for(int i = 0; i < R.rows; i++) {
         for(int j = 0; j < R.cols; j++) {
-            if(R.at<float>(i, j) > 150) {
+            if(R.at<float>(i, j) > 130) {
                 Point pt(j, i);
-                circle(result, pt, 2, Scalar(0, 255, 0), 2, 8, 0);
+                line(result, pt - Point(4, 0), pt + Point(4, 0), Scalar(0, 255, 0), 1);
+                line(result, pt - Point(0, 4), pt + Point(0, 4), Scalar(0, 255, 0), 1);
             }
         }
     }
 
-    imshow("result", result);
+    imshow("Harries Result", result);
 }
 
 void OpenCVDetector::SIFTDetection(){
