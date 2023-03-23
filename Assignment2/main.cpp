@@ -13,10 +13,10 @@ int main(int argc, char** argv) {
         return -1;
 	}
 	imshow("Source Image", src);
-	// OpenCVDetector detector = OpenCVDetector(src);
-	MyDetector detector = MyDetector(src);
+	OpenCVDetector detector = OpenCVDetector(src);
+	// MyDetector detector = MyDetector(src);
 	detector.harriesDetection();
-	// detector.SIFTDetection();
+	detector.SIFTDetection();
 
 
 	waitKey(0);

@@ -102,6 +102,7 @@ void MyDetector::harriesDetection(int threshold) {
 void OpenCVDetector::SIFTDetection(){
     // 初始化 SIFT 对象，提取特征点
     Ptr<SIFT> detector = SIFT::create();
+
     vector<KeyPoint> keypoints;
     detector->detect(this->src, keypoints);
 
@@ -109,12 +110,18 @@ void OpenCVDetector::SIFTDetection(){
     Mat descriptors;
     detector->compute(this->src, keypoints, descriptors);
 
+    //  进行低阈值抑制和消除边缘响应
+    std::vector<KeyPoint> keypoints_final;
+    float threshold = 0.03;
+    for (size_t i = 0; i < keypoints.size(); i++) {
+        // float curvatureRatio = keypoints[i].hessian / std::pow(keypoints[i].size / 2.0f, 2.0f);
+        // 过滤落在边缘上的关键点
+        if (keypoints[i].response >= threshold) {
+            keypoints_final.push_back(keypoints[i]);
+        }
+    }
+
     Mat img_keypoints;
-    drawKeypoints(this->src, keypoints, img_keypoints, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+    drawKeypoints(this->src, keypoints_final, img_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DEFAULT);
     imshow("result", img_keypoints);
-
-}
-
-void MyDetector::SIFTDetection() {
-
 }

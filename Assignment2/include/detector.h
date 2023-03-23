@@ -24,7 +24,6 @@ private:
 public:
     MyDetector(cv::Mat src) : src(src) {}
     void harriesDetection(int threshold=110);
-    void SIFTDetection();
 };
 
 #endif
