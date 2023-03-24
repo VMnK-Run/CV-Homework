@@ -13,12 +13,15 @@ int main(int argc, char** argv) {
         return -1;
 	}
 	imshow("Source Image", src);
-	OpenCVDetector detector = OpenCVDetector(src);
-	// MyDetector detector = MyDetector(src);
-	detector.harriesDetection();
-	detector.SIFTDetection();
+	OpenCVDetector opencvDetector = OpenCVDetector(src);
+	MyDetector myDetector = MyDetector(src);
 
+	opencvDetector.harriesDetection();
+	opencvDetector.SIFTDetection();
 
+	myDetector.harriesDetection();
+
+	cout << "Assignment2 Finished!" << endl;
 	waitKey(0);
     return 0;
 }

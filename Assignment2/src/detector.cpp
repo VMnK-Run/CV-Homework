@@ -24,7 +24,7 @@ void OpenCVDetector::harriesDetection(int threshold) {
         }
     }
 
-    imshow("Harries Result", result);
+    imshow("OpenCV Harries Result", result);
 }
 
 void MyDetector::harriesDetection(int threshold) {
@@ -96,7 +96,7 @@ void MyDetector::harriesDetection(int threshold) {
         }
     }
 
-    imshow("Harries Result", result);
+    imshow("My Harries Result", result);
 }
 
 void OpenCVDetector::SIFTDetection(){
@@ -123,5 +123,5 @@ void OpenCVDetector::SIFTDetection(){
 
     Mat img_keypoints;
     drawKeypoints(this->src, keypoints_final, img_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DEFAULT);
-    imshow("result", img_keypoints);
+    imshow("OpenCV SIFT Result", img_keypoints);
 }
