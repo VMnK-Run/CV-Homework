@@ -50,17 +50,16 @@
   cmake .. -G "Unix Makefiles"
   make
   ```
-
 + OpenCV 库函数实现方式运行
 
   ```bash
   ./main.exe opencv
   ```
-
 + 自行编码实现方式运行
-     ```bash
-      ./main.exe my
-     ```
+
+  ```bash
+   ./main.exe my
+  ```
 
 ### 效果展示
 
@@ -74,4 +73,4 @@
 
 #### 自行编码实现算法截图
 
-<img src="assets/mylk.png" alt="image-20230305201053547" style="zoom:70%;" />
+<img src="assets/myLK.png" alt="image-20230305201053547" style="zoom:70%;" />
