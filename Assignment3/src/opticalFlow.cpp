@@ -67,14 +67,6 @@ void OpticalFlowCalculator::myLK(int level, int windowSize) {
 
 	// 初始特征点选择
 	cv::goodFeaturesToTrack(prevGray, prevPoints, 100, 0.3, 7, Mat(), 7);
-	std::vector<Point2f> testPoints;
-	for(int i = 0; i < prevPoints.size(); i++) {
-		// cout << i << " " << prevPoints[i] << endl;
-		testPoints.push_back(prevPoints[i]);
-	}
-
-	
-	// testPoints.push_back(prevPoints[0]);
 
 	Mat displayMat;
 	Mat mask = Mat::zeros(prevFrame.size().height, prevFrame.size().width, CV_8UC3);
@@ -86,15 +78,14 @@ void OpticalFlowCalculator::myLK(int level, int windowSize) {
 		}
 		cvtColor(nextFrame, nextGray, COLOR_BGR2GRAY);
 		
-		nextPoints = this->calcLKOpticalFlow(prevGray, nextGray, testPoints, level, windowSize);
+		nextPoints = this->calcLKOpticalFlow(prevGray, nextGray, prevPoints, level, windowSize);
 		for(int i = 0; i < nextPoints.size(); i++) {
 			cv::Point2f nextPoint = nextPoints[i];
-			cv::Point2f prevPoint = testPoints[i];
+			cv::Point2f prevPoint = prevPoints[i];
 			std::cout << i << " " << prevPoint << " ==> " << nextPoint << " " << std::endl;
 			cv::line(mask, nextPoint, prevPoint, Scalar(0, 255, 0), 2, LINE_AA);
 			cv::circle(nextFrame, nextPoint, 3, Scalar(0, 0, 255), -1);
 		}
-		// break;
 		cv::add(nextFrame, mask, displayMat);
 		imshow("My LK", displayMat);
 		if(waitKey(1) == 27) {
@@ -102,7 +93,7 @@ void OpticalFlowCalculator::myLK(int level, int windowSize) {
 		}
 		prevFrame = nextFrame.clone();
 		prevGray = nextGray.clone();
-		std::copy(nextPoints.begin(), nextPoints.end(), testPoints.begin());
+		std::copy(nextPoints.begin(), nextPoints.end(), prevPoints.begin());
 	}
 }
 
@@ -114,7 +105,6 @@ std::vector<Point2f> OpticalFlowCalculator::calcLKOpticalFlow(cv::InputArray pre
 	std::vector<cv::Mat> nextPyramids = this->buildPyramid(nextImg, level);
 	// 计算每一个特征点的光流
 	for(int i = 0; i < prevPoints.size(); i++) {
-		bool isValid = true;
 		cv::Point2f prevPoint = prevPoints[i];
 		cv::Mat g(2, 1, CV_64F, Scalar(0)); // 估计值，初始为 0
 		for (int j = level - 1; j >= 0; j--) {
@@ -132,18 +122,14 @@ std::vector<Point2f> OpticalFlowCalculator::calcLKOpticalFlow(cv::InputArray pre
 			
 			int iterNum = 0;
 			double residual = 1;
-			// std::cout << std::endl;
-			// std::cout << "=======" << std::endl;
 			while(iterNum < this->maxIterations && residual > this->residualThreshold) {
 				iterNum++;
 				cv::Mat b = this->getMismatchVector(prevMat, nextMat, point.x, point.y, g, v, windowsize);
 				Mat miu = gradient.inv() * b;
 				v += miu;  // v 只在这里更新
 				residual = this->getResidual(miu);
-				// cout << "level = " << j << " iter = " << iterNum << " b = " << b.at<double>(0, 0) << " " << b.at<double>(1, 0) <<std::endl;
-				// std::cout << "residual= " << residual << std::endl; 
 			}
-			// cout << "level = " << j << " v = " << v.at<double>(0, 0) << " " << v.at<double>(1, 0) <<std::endl;
+
 			if (j == 0) {
 				g = g + v;  // 不再向下一层传播
 			} else {
@@ -151,7 +137,6 @@ std::vector<Point2f> OpticalFlowCalculator::calcLKOpticalFlow(cv::InputArray pre
 			}
 		}
 		// 此时, g 已经是最终计算结果
-		// std::cout << g << std::endl;
 		if(abs(g.at<double>(0, 0)) < 20 && abs(g.at<double>(1, 0)) < 20) {
 			Point nextPoint;
 			nextPoint.x = (prevPoint.x + g.at<double>(1, 0));
@@ -160,24 +145,14 @@ std::vector<Point2f> OpticalFlowCalculator::calcLKOpticalFlow(cv::InputArray pre
 		} else {
 			nextPoints.push_back(prevPoint);
 		}
-		
-		// } else {
-		// 	nextPoints.push_back(prevPoint);
-		// }
 	}
 	return nextPoints;
 }
 
 cv::Mat OpticalFlowCalculator::getGradientMat(cv::Mat frame, Point point, int windowSize) {
-	Mat dx, dy;
-	cv::Sobel(frame, dx, CV_64F, 1, 0);
-	cv::Sobel(frame, dy, CV_64F, 0, 1);
-
 	Mat gradient(2, 2, CV_64F, Scalar(0));
 	for(int i = point.y - windowSize; i <= point.y + windowSize; i++) {
 		for (int j = point.x - windowSize; j <= point.x + windowSize; j++) {
-			// double Ix = this->getMatDouble(dx, i, j);
-			// double Iy = this->getMatDouble(dy, i, j);
 			double Ix = (this->getMatDouble(frame, i + 1, j) - this->getMatDouble(frame, i - 1, j)) / 2.0;
 			double Iy = (this->getMatDouble(frame, i, j + 1) - this->getMatDouble(frame, i, j - 1)) / 2.0;
 			gradient.at<double>(0, 0) += Ix * Ix;
